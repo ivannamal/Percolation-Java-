@@ -1,0 +1,58 @@
+public class Percolation {
+    int openedCount; //к-ть відкритих комірок (1)
+    public WeightedQuickUnionUF wquf;
+    int N; // кількість рядків (і стовбців) у квадраті
+    int[][] id; //квадрат з нулями
+    public Percolation(int N) {
+        this.N = N;
+        this.id = new int[N][N];
+        this.wquf = new WeightedQuickUnionUF(N*N);
+        for(int i = 0; i<N; i++){
+            wquf.union(i, 0);
+        }
+        for(int i=N*N-N; i<N*N; i++){
+            wquf.union(i, N*N-1);
+        }
+    }
+
+    public int getOpenedCount() {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (isOpened(i, j)) {
+                    openedCount++;
+                }
+            }
+        }
+        return openedCount;
+    }
+
+    public void open(int i, int j){
+        if(!isOpened(i, j)){
+            id[i][j] = 1;
+            if(i!=0 && isOpened(i-1, j))
+                wquf.union(i*N+j, (i-1)*N+j);
+            if(j!=0 && isOpened(i, j-1))
+                wquf.union(i*N+j, i*N+j-1);
+            if(i!=N-1 && isOpened(i+1, j))
+                wquf.union(i*N+j, (i+1)*N+j);
+            if(j!=N-1 && isOpened(i, j+1))
+                wquf.union(i*N+j, i*N+j+1);
+        }
+    }
+
+    public boolean isOpened(int i, int j) {
+        if (id[i][j] == 1) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean percolates() {
+        if (wquf.connected(0, N*N-1)) {
+            return true;
+        }
+        return false;
+    }
+
+
+}
