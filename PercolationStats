@@ -1,0 +1,45 @@
+import java.util.Scanner;
+import princeton.lib.StdStats;
+import java.util.Random;
+public class PercolationStats {
+     int N; // кількість рядків (і стовбців) у квадраті
+     double[] allP; //тут усі ймовірності
+     double confInterval1;
+     double confInterval2;
+    public PercolationStats(int N, int T){
+        this.N = N;
+        Random random = new Random();
+        allP = new double[T];
+        for(int i = 0; i < T; i++){
+            Percolation percolation1 = new Percolation(N);
+            while(!percolation1.percolates()){
+                int i1 = random.nextInt(N);
+                int j = random.nextInt(N);
+                percolation1.open(i1, j);
+            }
+            allP[i] = (double)percolation1.getOpenedCount()/(N*N);
+        }
+        confInterval1 = mean() - 1.96*stddev()/Math.sqrt(allP.length);
+        confInterval2 = mean() + 1.96*stddev()/Math.sqrt(allP.length);
+    }
+    public double mean(){
+        return StdStats.mean(allP);
+    }
+    public double stddev(){
+        return StdStats.stddev(allP);
+    }
+    public String toString(){
+        return "% java PercolationStats " +  N + " " + allP.length  + '\n' +
+                "mean = " + mean() + '\n' +
+                "stddev = " + stddev() + '\n' +
+                "95% confidence interval = " + confInterval1 + ", " + confInterval2;
+    }
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int N = in.nextInt(); // кількість рядків (і стовбців) у квадраті
+        int T = in.nextInt(); // к-ть повторів програми над одним масивом
+        PercolationStats ps = new PercolationStats(N, T);
+        System.out.println(ps);
+    }
+}
